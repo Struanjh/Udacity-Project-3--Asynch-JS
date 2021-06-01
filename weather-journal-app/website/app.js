@@ -1,0 +1,100 @@
+/* Global Variables */
+
+// Create a new date instance dynamically with JS
+let d = new Date();
+let newDate = d.getMonth()+'.'+ d.getDate()+'.'+ d.getFullYear();
+
+
+// Personal API Key for OpenWeatherMap API
+
+let apiURL = 'api.openweathermap.org/data/2.5/weather?zip=';
+//let apiKey = ',us&appid=d661cd16fab2ed57c95ef97b210ffd95';
+let apiKey2 = ',us&appid=9edc62d3a1b7401e4e1186c11d0f5603';
+
+
+// Add Event Listener, when button is clicked, the API Call sequence is kicked off//
+
+document.getElementById('generate').addEventListener('click', weatherInfo);
+
+/* Function called by event listener */
+
+function weatherInfo(e) {
+    //Get the value the user has entered in the Zip Code text box//
+    let newZipCode = document.getElementById('zip').value;
+    //Make the Get Request API Call, using API variables declared above//
+    getWeatherData(apiURL, newZipCode, apiKey2)
+    //CHAINED PROMISE FOR POST REQUEST
+    //Once the data has been returned by the GET request, add it to the POST request below
+    .then(function(data) {
+        console.log(data);
+    //Post Request is sent to the Post Route we've set up in server.js//
+        postData('/addPost', {userresponse: data.userresponse, temperature: data.temperature, newDate : newDate})
+    })
+    //CHAINED PROMISE TO UPDATE UI//
+    //Once Post Data function has completed, call Update UI function
+    .then(
+        updateUI()
+    )
+    }
+
+/* Function to GET Web API Data*/
+
+const getWeatherData = async (apiURL, newZipCode, apiKey2) => {
+    //await means we don't move onto next line until we have the dynamic URL - stored in variable res'
+    const res = await fetch(apiURL+newZipCode+apiKey2);
+
+
+    //Once the data is returned execute the try code block//
+    //If there is a network error, then catch the error//
+
+    try {
+        const data = await res.json();
+        console.log(data);
+        return data;
+    } catch(error) {
+        console.log("error", error);
+    }
+}
+
+
+
+/* Function to POST data */
+//URL is the /postData route in server.js, data object will contain the parameters we got back from the GET Request API call to OpenWeather//
+const postData = async ( url = '', data = {}) => {
+    const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type' : 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+
+    //Perform try block of code upon successful post request
+    try {
+        const newData = await response.json();
+        console.log(newData);
+        return newData
+    } catch (error) {
+        console.log("error", error);
+    }
+}
+
+
+/* Function to GET Project Data */
+
+/* Function to Update UI */
+//We make a GET request to the GET route we've set up in server.js
+//Take the data stored in the API end point (taken from OpenWeather with GET Request & added with Post Request) & add it to the UI by selecting elements below//
+const updateUI = async () => {
+    const request = await fetch('/all');
+    try{
+      const allData = await request.json();
+      document.getElementById('date').innerHTML = allData[0].newDate;
+      document.getElementById('temp').innerHTML = allData[0].temperature;
+      document.getElementById('content').innerHTML = allData[0].userresponse;
+  
+    }catch(error){
+      console.log("error", error);
+    }
+  }
