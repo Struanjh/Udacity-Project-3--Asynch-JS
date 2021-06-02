@@ -57,8 +57,7 @@ function addData (req, res) {
     projectData["temperature"] = data.temperature;
     projectData["date"] = data.newDate;
     projectData["userresponse"] = data.userresponse;
+    res.send(projectData);
 }
-
-
 
 

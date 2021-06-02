@@ -7,7 +7,7 @@ let newDate = d.getMonth()+'.'+ d.getDate()+'.'+ d.getFullYear();
 
 // Personal API Key for OpenWeatherMap API
 
-let apiURL = 'api.openweathermap.org/data/2.5/weather?zip=';
+let apiURL = 'https://api.openweathermap.org/data/2.5/weather?zip=';
 //let apiKey = ',us&appid=d661cd16fab2ed57c95ef97b210ffd95';
 let apiKey2 = ',us&appid=9edc62d3a1b7401e4e1186c11d0f5603';
 
@@ -21,6 +21,8 @@ document.getElementById('generate').addEventListener('click', weatherInfo);
 function weatherInfo(e) {
     //Get the value the user has entered in the Zip Code text box//
     let newZipCode = document.getElementById('zip').value;
+    //Get the value the user entered in the feelings textbox//
+    let userresponse = document.getElementById('feelings').value;
     //Make the Get Request API Call, using API variables declared above//
     getWeatherData(apiURL, newZipCode, apiKey2)
     //CHAINED PROMISE FOR POST REQUEST
@@ -28,8 +30,11 @@ function weatherInfo(e) {
     .then(function(data) {
         console.log(data);
     //Post Request is sent to the Post Route we've set up in server.js//
-        postData('/addPost', {userresponse: data.userresponse, temperature: data.temperature, newDate : newDate})
+    //In the data object, the userresponse and date come from the text user entered, stored in variables set up earlier//
+    //The temperature data comes from Open Weather API, constructed according to their documenation//
+        postData('/addPost', {userresponse: userresponse, temperature: data.main.temp, newDate : newDate})
     })
+
     //CHAINED PROMISE TO UPDATE UI//
     //Once Post Data function has completed, call Update UI function
     .then(
@@ -90,9 +95,10 @@ const updateUI = async () => {
     const request = await fetch('/all');
     try{
       const allData = await request.json();
-      document.getElementById('date').innerHTML = allData[0].newDate;
-      document.getElementById('temp').innerHTML = allData[0].temperature;
-      document.getElementById('content').innerHTML = allData[0].userresponse;
+
+      document.getElementById('date').innerHTML = allData.date;
+      document.getElementById('temp').innerHTML = allData.temperature;
+      document.getElementById('content').innerHTML = allData.userresponse;
   
     }catch(error){
       console.log("error", error);
