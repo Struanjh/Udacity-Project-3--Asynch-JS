@@ -2,14 +2,14 @@
 
 // Create a new date instance dynamically with JS
 let d = new Date();
-let newDate = d.getMonth()+'.'+ d.getDate()+'.'+ d.getFullYear();
+let newDate = d.getMonth()+1+'.'+ d.getDate()+'.'+ d.getFullYear();
 
 
 // Personal API Key for OpenWeatherMap API
 
 let apiURL = 'https://api.openweathermap.org/data/2.5/weather?zip=';
 //let apiKey = ',us&appid=d661cd16fab2ed57c95ef97b210ffd95';
-let apiKey2 = ',us&appid=9edc62d3a1b7401e4e1186c11d0f5603';
+const apiKey2 = ',us&appid=9edc62d3a1b7401e4e1186c11d0f5603&units=metric';
 
 
 // Add Event Listener, when button is clicked, the API Call sequence is kicked off//
@@ -37,7 +37,7 @@ function weatherInfo(e) {
 
     //CHAINED PROMISE TO UPDATE UI//
     //Once Post Data function has completed, call Update UI function
-    .then(
+    .then(() =>
         updateUI()
     )
     }
